@@ -151,4 +151,345 @@
               <div id="pomBar" class="h-full" style="background: var(--accent); width:0%"></div>
             </div>
             <p class="muted text-sm mt-2">Phase: <span id="pomPhase">focus</span> • Cycle <span id="pomCycle">1</span></p>
-            <label class="mt-3 inline-flex items-center gap-2"><input id="softChime" type="checkbox" class="scale-
+            <label class="mt-3 inline-flex items-center gap-2"><input id="softChime" type="checkbox" class="scale-125" checked /> <span class="muted text-sm">Soft chime when switching</span></label>
+          </div>
+        </div>
+        <div class="card rounded-2xl p-4">
+          <h3 class="font-semibold mb-3">Single Timer</h3>
+          <div class="grid grid-cols-3 gap-2 mb-3">
+            <input id="singleMin" type="number" min="0" class="rounded-xl px-3 py-2 bg-white/5 border border-white/10" value="10" />
+            <input id="singleSec" type="number" min="0" max="59" class="rounded-xl px-3 py-2 bg-white/5 border border-white/10" value="0" />
+            <button id="startSingle" class="btn tap">Start</button>
+          </div>
+          <div class="text-4xl font-bold" id="singleTime">10:00</div>
+          <div class="flex gap-2 mt-2">
+            <button id="pauseSingle" class="btn btn-warn tap">Pause</button>
+            <button id="resetSingle" class="btn btn-ghost tap">Reset</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOS -->
+    <section id="panel-sos" class="panel hidden">
+      <div class="grid lg:grid-cols-3 gap-4">
+        <div class="card rounded-2xl p-4">
+          <h3 class="font-semibold mb-2">5-4-3-2-1 Grounding</h3>
+          <ol id="groundSteps" class="list-decimal list-inside space-y-1 text-sm">
+            <li>Look: 5 things you can see</li>
+            <li>Touch: 4 things you can feel</li>
+            <li>Hear: 3 sounds around you</li>
+            <li>Smell: 2 scents you notice</li>
+            <li>Taste: 1 thing (or a sip of water)</li>
+          </ol>
+          <button id="startGround" class="btn tap mt-3">Start Guidance</button>
+          <div id="groundGuide" class="mt-3 hidden">
+            <div class="text-2xl font-bold" id="groundCue">Look: 5 things you can see</div>
+            <div class="muted text-sm" id="groundNote">When ready, press Next.</div>
+            <div class="flex gap-2 mt-3">
+              <button id="nextGround" class="btn tap">Next</button>
+              <button id="resetGround" class="btn btn-ghost tap">Reset</button>
+            </div>
+          </div>
+        </div>
+        <div class="card rounded-2xl p-4">
+          <h3 class="font-semibold mb-2">Box Breathing (4–4–4–4)</h3>
+          <div class="text-6xl font-bold" id="breathCount">4</div>
+          <div class="muted">Phase: <span id="breathPhase">Inhale</span></div>
+          <div class="flex gap-2 mt-3">
+            <button id="startBreath" class="btn tap">Start</button>
+            <button id="stopBreath" class="btn btn-ghost tap">Stop</button>
+          </div>
+        </div>
+        <div class="card rounded-2xl p-4">
+          <h3 class="font-semibold mb-2">Soothing Script</h3>
+          <textarea id="scriptText" class="w-full min-h-[140px] rounded-xl px-3 py-2 bg-white/5 border border-white/10" placeholder="Type words that help you feel safe. Example: “I’m safe right now. My body is allowed to slow down. I can take tiny steps.”"></textarea>
+          <div class="flex gap-2 mt-3">
+            <button id="saveScript" class="btn tap">Save</button>
+            <button id="sayScript" class="btn btn-ok tap">Play Voice</button>
+          </div>
+          <p class="muted text-xs mt-2">Safety: If you’re in the U.S. and in crisis, call/text <span class="font-semibold">988</span>. In immediate danger, call your local emergency number.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SENSORY -->
+    <section id="panel-sensory" class="panel hidden">
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="card rounded-2xl p-4">
+          <h3 class="font-semibold mb-2">Low-Stimulus Mode</h3>
+          <label class="flex items-center gap-2 mb-3"><input id="lowStim" type="checkbox" class="scale-125" /> <span>Enable low-stimulus theme</span></label>
+          <label class="block mb-2">Dim screen
+            <input id="dimRange" type="range" min="0" max="95" value="0" class="w-full" />
+          </label>
+        </div>
+        <div class="card rounded-2xl p-4">
+          <h3 class="font-semibold mb-2">Calming Audio</h3>
+          <div class="flex gap-2">
+            <button id="noiseBtn" class="btn tap">White Noise</button>
+            <button id="brownBtn" class="btn tap">Brown Noise</button>
+            <button id="stopNoise" class="btn btn-ghost tap">Stop</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NOTES -->
+    <section id="panel-notes" class="panel hidden">
+      <div class="card rounded-2xl p-4">
+        <h3 class="font-semibold mb-2">Quick Notes</h3>
+        <textarea id="notes" class="w-full min-h-[260px] rounded-xl px-3 py-2 bg-white/5 border border-white/10" placeholder="Dump thoughts, ideas, reminders without rules or grammar."></textarea>
+        <div class="mt-2 text-right">
+          <button id="saveNotes" class="btn tap">Save Notes</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="max-w-5xl mx-auto p-4 pb-10 text-center muted text-xs">
+    <p>NeuroBuddy MVP • Local-first • No login • Not medical advice. Built for neuro-affirming support. 💜</p>
+  </footer>
+
+  <script>
+    // ---- Local store ----
+    const Store = {
+      key: 'neurobuddy_v1',
+      data: {
+        wins: [],
+        lists: [], // [{id, title, items:[{id, text, done}]}]
+        script: '',
+        notes: '',
+        settings: { theme:'dark', dys:false, lowStim:false, dim:0, pom:{focus:25, short:5, long:15} }
+      },
+      load(){
+        try{ const raw = localStorage.getItem(this.key); if(raw){ this.data = JSON.parse(raw);} }catch(e){ console.warn(e); }
+        applySettings();
+        renderAll();
+      },
+      save(){ localStorage.setItem(this.key, JSON.stringify(this.data)); }
+    };
+
+    // ---- Tabs ----
+    const tabs = document.querySelectorAll('.tab');
+    const panels = document.querySelectorAll('.panel');
+    function activateTab(name){
+      tabs.forEach(t=>{ t.classList.toggle('tab-active', t.dataset.tab===name);});
+      panels.forEach(p=>{ p.classList.toggle('hidden', p.id!==`panel-${name}`); });
+      history.replaceState(null,'',`#${name}`);
+    }
+    document.getElementById('tabs').addEventListener('click', (e)=>{
+      const b = e.target.closest('[data-tab]'); if(!b) return; activateTab(b.dataset.tab);
+    });
+    document.querySelectorAll('[data-tab-jump]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault(); activateTab(a.dataset.tabJump);}))
+
+    // ---- Theme + Dyslexia ----
+    function applySettings(){
+      document.body.classList.toggle('theme-light', Store.data.settings.theme==='light');
+      document.body.classList.toggle('dyslexia', !!Store.data.settings.dys);
+      document.getElementById('lowStim').checked = !!Store.data.settings.lowStim;
+      document.getElementById('dimmer').style.opacity = (Store.data.settings.dim||0)/100;
+    }
+    document.getElementById('themeBtn').onclick = ()=>{
+      Store.data.settings.theme = Store.data.settings.theme==='light'?'dark':'light'; Store.save(); applySettings();
+    };
+    document.getElementById('dysBtn').onclick = ()=>{
+      Store.data.settings.dys = !Store.data.settings.dys; Store.save(); applySettings();
+    };
+
+    // ---- Export / Import ----
+    document.getElementById('exportBtn').onclick = ()=>{
+      const blob = new Blob([JSON.stringify(Store.data,null,2)], {type:'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'neurobuddy-data.json'; a.click();
+    };
+    document.getElementById('importFile').addEventListener('change', (e)=>{
+      const f = e.target.files[0]; if(!f) return; const r = new FileReader();
+      r.onload = ()=>{ try{ Store.data = JSON.parse(r.result); Store.save(); applySettings(); renderAll(); alert('Imported!'); }catch(err){ alert('Invalid file.'); } };
+      r.readAsText(f);
+    });
+
+    // ---- Wins (Home) ----
+    const winInput = document.getElementById('winInput');
+    const winsList = document.getElementById('winsList');
+    document.getElementById('addWin').onclick = ()=>{
+      const t = (winInput.value||'').trim(); if(!t) return;
+      if(Store.data.wins.length>=3){ Store.data.wins.shift(); }
+      Store.data.wins.push({id:crypto.randomUUID(), text:t}); Store.save(); winInput.value=''; renderWins();
+    };
+    function renderWins(){
+      winsList.innerHTML = Store.data.wins.map(w=>`<li class="flex items-center gap-2"><span>✅</span><span>${escapeHtml(w.text)}</span><button data-del="${w.id}" class="ml-auto btn btn-ghost tap">Delete</button></li>`).join('');
+      winsList.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ Store.data.wins = Store.data.wins.filter(x=>x.id!==b.dataset.del); Store.save(); renderWins(); });
+    }
+
+    // ---- Body Doubling link ----
+    document.getElementById('jitsiBtn').onclick = ()=>{
+      const room = 'NeuroBuddy-' + Math.random().toString(36).slice(2,8);
+      const url = `https://meet.jit.si/${room}`;
+      document.getElementById('jitsiLink').value = url;
+    };
+    document.getElementById('copyJitsi').onclick = ()=>{
+      const i = document.getElementById('jitsiLink'); i.select(); document.execCommand('copy');
+    };
+
+    // ---- Routines ----
+    const listsEl = document.getElementById('lists');
+    document.getElementById('addList').onclick = ()=>{
+      const title = prompt('Name this routine (e.g., Morning Reset)'); if(!title) return;
+      Store.data.lists.push({id:crypto.randomUUID(), title, items:[]}); Store.save(); renderLists();
+    };
+    function renderLists(){
+      listsEl.innerHTML = Store.data.lists.map(list=>{
+        const items = list.items.map(it=>`<li class="flex items-center gap-2">
+          <input type="checkbox" ${it.done?'checked':''} data-tgl="${it.id}" class="scale-125"/>
+          <span class="flex-1 ${it.done?'line-through opacity-60':''}">${escapeHtml(it.text)}</span>
+          <button class="btn btn-ghost tap" data-delitem="${it.id}">🗑️</button>
+        </li>`).join('');
+        return `<div class="card rounded-2xl p-4" data-list="${list.id}">
+          <div class="flex items-center gap-2 mb-2">
+            <input class="flex-1 rounded-xl px-3 py-2 bg-white/5 border border-white/10" value="${escapeHtml(list.title)}" data-title />
+            <button class="btn btn-ghost tap" data-del="${list.id}">Delete</button>
+          </div>
+          <div class="flex gap-2 mb-2">
+            <input class="flex-1 rounded-xl px-3 py-2 bg-white/5 border border-white/10" placeholder="Add a tiny step…" data-new />
+            <button class="btn tap" data-add>＋ Add</button>
+            <button class="btn btn-ghost tap" data-clear>Clear checks</button>
+          </div>
+          <ul class="space-y-2">${items || '<li class="muted">No steps yet.</li>'}</ul>
+        </div>`;
+      }).join('') || `<div class="muted">No routines yet. Click “New Routine”.</div>`;
+
+      // wire events
+      listsEl.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ Store.data.lists = Store.data.lists.filter(l=>l.id!==b.dataset.del); Store.save(); renderLists(); });
+      listsEl.querySelectorAll('[data-title]').forEach(inp=>inp.onchange=()=>{ const id=inp.closest('[data-list]').dataset.list; const l=Store.data.lists.find(x=>x.id===id); l.title=inp.value; Store.save(); });
+      listsEl.querySelectorAll('[data-add]').forEach(btn=>btn.onclick=()=>{ const wrap=btn.closest('[data-list]'); const inp=wrap.querySelector('[data-new]'); const t=(inp.value||'').trim(); if(!t) return; const l=Store.data.lists.find(x=>x.id===wrap.dataset.list); l.items.push({id:crypto.randomUUID(), text:t, done:false}); Store.save(); inp.value=''; renderLists(); });
+      listsEl.querySelectorAll('[data-clear]').forEach(btn=>btn.onclick=()=>{ const id=btn.closest('[data-list]').dataset.list; const l=Store.data.lists.find(x=>x.id===id); l.items.forEach(i=>i.done=false); Store.save(); renderLists(); });
+      listsEl.querySelectorAll('[data-tgl]').forEach(cb=>cb.onchange=()=>{ const id=cb.dataset.tgl; const l = Store.data.lists.find(L=>L.items.some(i=>i.id===id)); const it = l.items.find(i=>i.id===id); it.done = cb.checked; Store.save(); renderLists(); });
+      listsEl.querySelectorAll('[data-delitem]').forEach(b=>b.onclick=()=>{ const id=b.dataset.delitem; const l = Store.data.lists.find(L=>L.items.some(i=>i.id===id)); l.items = l.items.filter(i=>i.id!==id); Store.save(); renderLists(); });
+    }
+
+    // ---- Timers ----
+    let pomInt=null, pomPhase='focus', pomLeft=0, pomTotal=0, cycle=1;
+    const focusMin=document.getElementById('focusMin');
+    const shortMin=document.getElementById('shortMin');
+    const longMin=document.getElementById('longMin');
+    const pomTime=document.getElementById('pomTime');
+    const pomBar=document.getElementById('pomBar');
+    const pomPhaseEl=document.getElementById('pomPhase');
+    const pomCycleEl=document.getElementById('pomCycle');
+
+    function setPom(durMin){ pomLeft = durMin*60; pomTotal = pomLeft; renderPom(); }
+    function renderPom(){
+      const m = Math.floor(pomLeft/60).toString().padStart(2,'0');
+      const s = Math.floor(pomLeft%60).toString().padStart(2,'0');
+      pomTime.textContent = `${m}:${s}`;
+      const pct = pomTotal? (100*(1 - (pomLeft/pomTotal))) : 0; pomBar.style.width = pct+"%";
+      pomPhaseEl.textContent = pomPhase; pomCycleEl.textContent = cycle;
+    }
+    function chime(){ if(!document.getElementById('softChime').checked) return; const ctx=new (window.AudioContext||window.webkitAudioContext)(); const o=ctx.createOscillator(); const g=ctx.createGain(); o.type='sine'; o.frequency.value=880; o.connect(g); g.connect(ctx.destination); g.gain.setValueAtTime(0.0001, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime+0.02); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.4); o.start(); o.stop(ctx.currentTime+0.45); }
+
+    document.getElementById('startPom').onclick = ()=>{
+      Store.data.settings.pom = {focus:+focusMin.value||25, short:+shortMin.value||5, long:+longMin.value||15}; Store.save();
+      if(!pomInt){
+        if(pomLeft<=0){
+          pomPhase='focus'; cycle=1; setPom(Store.data.settings.pom.focus);
+        }
+        pomInt = setInterval(()=>{
+          pomLeft--; renderPom();
+          if(pomLeft<=0){
+            clearInterval(pomInt); pomInt=null; chime();
+            if(pomPhase==='focus'){
+              pomPhase='break'; const isLong = (cycle%4===0); setPom(isLong?Store.data.settings.pom.long:Store.data.settings.pom.short);
+            }else{ pomPhase='focus'; cycle++; setPom(Store.data.settings.pom.focus); }
+            document.getElementById('startPom').click();
+          }
+        }, 1000);
+      }
+    };
+    document.getElementById('pausePom').onclick = ()=>{ if(pomInt){ clearInterval(pomInt); pomInt=null; } else { document.getElementById('startPom').click(); } };
+    document.getElementById('resetPom').onclick = ()=>{ if(pomInt){ clearInterval(pomInt); pomInt=null;} pomPhase='focus'; cycle=1; setPom(+focusMin.value||25); };
+
+    function loadPom(){ const p=Store.data.settings.pom||{focus:25,short:5,long:15}; focusMin.value=p.focus; shortMin.value=p.short; longMin.value=p.long; setPom(p.focus); }
+
+    // Single timer
+    let singleInt=null, singleLeft=600, singleTotal=600;
+    const singleTime=document.getElementById('singleTime');
+    function renderSingle(){ const m=Math.floor(singleLeft/60).toString().padStart(2,'0'); const s=Math.floor(singleLeft%60).toString().padStart(2,'0'); singleTime.textContent=`${m}:${s}`; }
+    document.getElementById('startSingle').onclick=()=>{
+      singleLeft = (+(document.getElementById('singleMin').value)||0)*60 + (+(document.getElementById('singleSec').value)||0);
+      singleTotal = singleLeft; renderSingle(); if(singleInt) return; singleInt=setInterval(()=>{ singleLeft--; renderSingle(); if(singleLeft<=0){ clearInterval(singleInt); singleInt=null; chime(); } },1000);
+    };
+    document.getElementById('pauseSingle').onclick=()=>{ if(singleInt){ clearInterval(singleInt); singleInt=null; } else { document.getElementById('startSingle').click(); } };
+    document.getElementById('resetSingle').onclick=()=>{ if(singleInt){ clearInterval(singleInt); singleInt=null; } singleLeft=singleTotal; renderSingle(); };
+
+    // ---- SOS: Grounding & Breathing ----
+    const cues=[
+      'Look: find 5 things you can see',
+      'Touch: 4 things you can feel',
+      'Hear: 3 sounds around you',
+      'Smell: 2 scents you notice',
+      'Taste: 1 thing (or sip of water)'
+    ];
+    let gIdx=0; const groundGuide=document.getElementById('groundGuide'); const groundCue=document.getElementById('groundCue');
+    document.getElementById('startGround').onclick=()=>{ gIdx=0; groundCue.textContent=cues[gIdx]; groundGuide.classList.remove('hidden'); };
+    document.getElementById('nextGround').onclick=()=>{ gIdx++; if(gIdx>=cues.length){ groundCue.textContent='Done. Notice how your body feels.'; } else { groundCue.textContent=cues[gIdx]; } };
+    document.getElementById('resetGround').onclick=()=>{ groundGuide.classList.add('hidden'); };
+
+    let breathInt=null, bPhase=['Inhale','Hold','Exhale','Hold'], bIdx=0, bCount=4;
+    const breathCount=document.getElementById('breathCount'); const breathPhase=document.getElementById('breathPhase');
+    document.getElementById('startBreath').onclick=()=>{
+      if(breathInt) return; bIdx=0; bCount=4; breathPhase.textContent=bPhase[bIdx]; breathCount.textContent=bCount;
+      breathInt=setInterval(()=>{ bCount--; breathCount.textContent=bCount; if(bCount<=0){ bIdx=(bIdx+1)%4; breathPhase.textContent=bPhase[bIdx]; bCount=4; }
+      },1000);
+    };
+    document.getElementById('stopBreath').onclick=()=>{ clearInterval(breathInt); breathInt=null; };
+
+    // ---- SOS: Script & Speech ----
+    const scriptText=document.getElementById('scriptText');
+    document.getElementById('saveScript').onclick=()=>{ Store.data.script = scriptText.value; Store.save(); };
+    document.getElementById('sayScript').onclick=()=>{ const t = (scriptText.value||'I am safe. I can go slow. Tiny steps count.'); const u=new SpeechSynthesisUtterance(t); u.rate=0.9; u.pitch=1; speechSynthesis.speak(u); };
+
+    // ---- Sensory: Low-stimulus + Dimmer + Noise ----
+    const lowStim=document.getElementById('lowStim'); const dimRange=document.getElementById('dimRange'); const dimmer=document.getElementById('dimmer');
+    lowStim.onchange=()=>{ Store.data.settings.lowStim = lowStim.checked; Store.save(); };
+    dimRange.oninput=()=>{ dimmer.style.opacity = (+dimRange.value)/100; Store.data.settings.dim = +dimRange.value; Store.save(); };
+
+    let audioCtx=null, noiseNode=null;
+    function startNoise(type='white'){
+      stopNoise(); audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      const bufferSize = 2 * audioCtx.sampleRate;
+      const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      if(type==='white'){
+        for (let i = 0; i < bufferSize; i++) { output[i] = Math.random() * 2 - 1; }
+      } else { // brown noise
+        let lastOut = 0.0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          output[i] = (lastOut + (0.02 * white)) / 1.02;
+          lastOut = output[i]; output[i] *= 3.5; // gain
+        }
+      }
+      noiseNode = audioCtx.createBufferSource();
+      noiseNode.buffer = noiseBuffer; noiseNode.loop = true;
+      const gain = audioCtx.createGain(); gain.gain.value = 0.1;
+      noiseNode.connect(gain).connect(audioCtx.destination); noiseNode.start();
+    }
+    function stopNoise(){ try{ if(noiseNode){ noiseNode.stop(); noiseNode.disconnect(); noiseNode=null; } if(audioCtx){ audioCtx.close(); audioCtx=null; } }catch(e){} }
+    document.getElementById('noiseBtn').onclick=()=>startNoise('white');
+    document.getElementById('brownBtn').onclick=()=>startNoise('brown');
+    document.getElementById('stopNoise').onclick=stopNoise;
+
+    // ---- Notes ----
+    document.getElementById('saveNotes').onclick=()=>{ Store.data.notes = document.getElementById('notes').value; Store.save(); };
+
+    // ---- Utilities ----
+    function renderAll(){ renderWins(); renderLists(); scriptText.value = Store.data.script||''; document.getElementById('notes').value = Store.data.notes||''; loadPom(); }
+    function escapeHtml(str){ return str.replace(/[&<>"]/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[m])); }
+
+    // ---- Init ----
+    window.addEventListener('load', ()=>{
+      const hash = (location.hash||'#home').slice(1); activateTab(hash);
+      Store.load();
+    });
+  </script>
+</body>
+</html>
