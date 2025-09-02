@@ -8,4 +8,147 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     :root{
-      --bg:#0b
+      --bg:#0b1020; /* low-stimulus dark */
+      --fg:#e8ecf1;
+      --muted:#9fb0c0;
+      --accent:#7dc4ff;
+      --ok:#8ae8c2;
+      --warn:#ffd477;
+      --danger:#ff9aa2;
+    }
+    .theme-light{ --bg:#f7fafc; --fg:#0c1320; --muted:#5b6570; --accent:#2563eb; --ok:#0ea5e9; --warn:#f59e0b; --danger:#ef4444; }
+    body{ background:var(--bg); color:var(--fg); }
+    .card{ background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); backdrop-filter: blur(6px); }
+    .btn{ /* tailwind apply, but inline here for clarity */ border-radius:1rem; padding:.5rem 1rem; font-weight:600; background:var(--accent); color:white; box-shadow:0 6px 20px rgba(0,0,0,.15)}
+    .btn-ghost{ background:transparent; border:1px solid rgba(255,255,255,0.2); color:var(--fg); }
+    .btn-ok{ background:var(--ok); color:#07373a; }
+    .btn-warn{ background:var(--warn); color:#3a2a07; }
+    .btn-danger{ background:var(--danger); color:#3a070c; }
+    .muted{ color:var(--muted); }
+    .tap{ min-height:3rem; }
+    .dyslexia *{ letter-spacing:0.02em; word-spacing:0.06em; line-height:1.7; }
+    #dimmer{ position:fixed; inset:0; background:black; opacity:0; pointer-events:none; z-index:40; transition:opacity .2s; }
+    .tab-active{ position:relative; }
+    .tab-active::after{ content:""; position:absolute; left:12px; right:12px; bottom:-4px; height:3px; background:var(--accent); border-radius:9999px; }
+    :focus-visible{ outline:3px solid var(--accent); outline-offset:2px; border-radius:.75rem; }
+    .rounded-2xl{ border-radius:1rem; }
+  </style>
+</head>
+<body class="min-h-screen selection:bg-sky-300/30">
+  <div id="dimmer"></div>
+
+  <header class="max-w-5xl mx-auto px-4 pt-6 pb-2">
+    <div class="flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-sky-500/20 grid place-content-center text-sky-300">🧠</div>
+        <h1 class="text-2xl md:text-3xl font-bold">NeuroBuddy <span class="text-sm align-top px-2 py-1 rounded-full bg-white/10 border border-white/10 ml-2">MVP</span></h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="themeBtn" class="btn btn-ghost tap" aria-label="Toggle theme">🌓 Theme</button>
+        <button id="dysBtn" class="btn btn-ghost tap" aria-label="Toggle dyslexia-friendly spacing">🔤 Text</button>
+        <button id="exportBtn" class="btn btn-ghost tap" aria-label="Export data">⬇️ Export</button>
+        <label class="btn btn-ghost tap cursor-pointer" title="Import data">
+          ⬆️ Import
+          <input id="importFile" type="file" accept="application/json" class="hidden" />
+        </label>
+      </div>
+    </div>
+    <p class="muted mt-1">Free, offline-first helper for ADHD & autistic adults. Your data stays in your browser (local-only).</p>
+  </header>
+
+  <nav class="sticky top-0 z-30 bg-[var(--bg)]/95 backdrop-blur border-y border-white/10">
+    <div class="max-w-5xl mx-auto px-2">
+      <div id="tabs" class="grid grid-cols-2 md:grid-cols-6 gap-2 py-2">
+        <button data-tab="home" class="tab btn-ghost tap rounded-2xl p-3">🏠 Home</button>
+        <button data-tab="routines" class="tab btn-ghost tap rounded-2xl p-3">🗂️ Routines</button>
+        <button data-tab="timers" class="tab btn-ghost tap rounded-2xl p-3">⏱️ Timers</button>
+        <button data-tab="sos" class="tab btn-ghost tap rounded-2xl p-3">🆘 SOS</button>
+        <button data-tab="sensory" class="tab btn-ghost tap rounded-2xl p-3">🕯️ Sensory</button>
+        <button data-tab="notes" class="tab btn-ghost tap rounded-2xl p-3">📝 Notes</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-5xl mx-auto p-4 space-y-6">
+    <!-- HOME -->
+    <section id="panel-home" class="panel">
+      <div class="card rounded-2xl p-4">
+        <h2 class="text-xl font-semibold mb-2">Welcome</h2>
+        <p class="muted">Pick a tab to get started. Everything works offline. This is a neuro-affirming space—no shame, no pressure. Tiny steps count. 💚</p>
+        <div class="mt-4 grid sm:grid-cols-3 gap-3">
+          <a href="#" data-tab-jump="routines" class="card rounded-2xl p-4 block hover:brightness-110">
+            <div class="text-3xl">🗂️</div>
+            <div class="font-semibold mt-2">Build a simple routine</div>
+            <div class="muted text-sm">Break tasks into tiny, doable steps.</div>
+          </a>
+          <a href="#" data-tab-jump="timers" class="card rounded-2xl p-4 block hover:brightness-110">
+            <div class="text-3xl">⏱️</div>
+            <div class="font-semibold mt-2">Start a gentle timer</div>
+            <div class="muted text-sm">Flexible Pomodoro & body-doubling link.</div>
+          </a>
+          <a href="#" data-tab-jump="sos" class="card rounded-2xl p-4 block hover:brightness-110">
+            <div class="text-3xl">🆘</div>
+            <div class="font-semibold mt-2">Ground & regulate</div>
+            <div class="muted text-sm">5-4-3-2-1, box breathing, scripts.</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="card rounded-2xl p-4">
+          <h3 class="font-semibold mb-2">Today’s 3 Tiny Wins</h3>
+          <div class="flex gap-2 mb-2">
+            <input id="winInput" class="w-full rounded-xl px-3 py-2 bg-white/5 border border-white/10" placeholder="e.g., brushed teeth, drank water…" />
+            <button id="addWin" class="btn tap">Add</button>
+          </div>
+          <ul id="winsList" class="space-y-2"></ul>
+        </div>
+        <div class="card rounded-2xl p-4">
+          <h3 class="font-semibold mb-2">Quick Body Doubling</h3>
+          <p class="muted text-sm mb-3">Open a free co-focus room and share the link with a friend.</p>
+          <div class="flex gap-2">
+            <button id="jitsiBtn" class="btn tap">Create Jitsi Room</button>
+            <input id="jitsiLink" class="w-full rounded-xl px-3 py-2 bg-white/5 border border-white/10" readonly />
+            <button id="copyJitsi" class="btn btn-ghost tap">Copy</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ROUTINES -->
+    <section id="panel-routines" class="panel hidden">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-xl font-semibold">Routines</h2>
+        <button id="addList" class="btn tap">＋ New Routine</button>
+      </div>
+      <div id="lists" class="grid md:grid-cols-2 gap-4"></div>
+    </section>
+
+    <!-- TIMERS -->
+    <section id="panel-timers" class="panel hidden">
+      <div class="grid lg:grid-cols-2 gap-4">
+        <div class="card rounded-2xl p-4">
+          <h3 class="font-semibold mb-3">Flexible Pomodoro</h3>
+          <div class="grid grid-cols-3 gap-2 mb-3">
+            <label class="block"><span class="muted text-sm">Focus (min)</span>
+              <input id="focusMin" type="number" min="1" class="w-full rounded-xl px-3 py-2 bg-white/5 border border-white/10" value="25" />
+            </label>
+            <label class="block"><span class="muted text-sm">Short Break</span>
+              <input id="shortMin" type="number" min="1" class="w-full rounded-xl px-3 py-2 bg-white/5 border border-white/10" value="5" />
+            </label>
+            <label class="block"><span class="muted text-sm">Long Break</span>
+              <input id="longMin" type="number" min="1" class="w-full rounded-xl px-3 py-2 bg-white/5 border border-white/10" value="15" />
+            </label>
+          </div>
+          <div class="flex gap-2 mb-3">
+            <button class="btn tap" data-phase="focus" id="startPom">Start Focus</button>
+            <button class="btn btn-warn tap" id="pausePom">Pause</button>
+            <button class="btn btn-ghost tap" id="resetPom">Reset</button>
+          </div>
+          <div class="card rounded-2xl p-4">
+            <div class="text-4xl font-bold mb-2" id="pomTime">25:00</div>
+            <div class="w-full h-3 bg-white/10 rounded-full overflow-hidden">
+              <div id="pomBar" class="h-full" style="background: var(--accent); width:0%"></div>
+            </div>
+            <p class="muted text-sm mt-2">Phase: <span id="pomPhase">focus</span> • Cycle <span id="pomCycle">1</span></p>
+            <label class="mt-3 inline-flex items-center gap-2"><input id="softChime" type="checkbox" class="scale-
