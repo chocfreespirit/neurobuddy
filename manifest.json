@@ -1,0 +1,14 @@
+{
+  "name": "NeuroBuddy — AUDHD Helper",
+  "short_name": "NeuroBuddy",
+  "description": "Offline-first helper for ADHD & autistic adults: routines, timers, SOS, sensory tools.",
+  "start_url": "/neurobuddy/",
+  "scope": "/neurobuddy/",
+  "display": "standalone",
+  "background_color": "#0b1020",
+  "theme_color": "#0b1020",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
